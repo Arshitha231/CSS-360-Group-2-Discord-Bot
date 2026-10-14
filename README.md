@@ -2,6 +2,8 @@
 
 # Javascript Discord Welcome MemeBot with GitHub Codespaces
 
+Names: Jack Jiang, Suna, Tyler, Michael W
+
 <img src="https://octodex.github.com/images/Robotocat.png" alt="image of robotocat" width="200" style="border:100px solid black"/>
 
 Customize and deploy your own welcome memebot for your Discord server! 
