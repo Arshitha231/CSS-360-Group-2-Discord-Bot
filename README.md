@@ -2,7 +2,7 @@
 
 # Javascript Discord Welcome MemeBot with GitHub Codespaces
 
-Names: Jack Jiang, Suna, Tyler, Michael W
+Names: Jack Jiang, Suna, Tyler, Michael W, Arshitha
 
 <img src="https://octodex.github.com/images/Robotocat.png" alt="image of robotocat" width="200" style="border:100px solid black"/>
 
