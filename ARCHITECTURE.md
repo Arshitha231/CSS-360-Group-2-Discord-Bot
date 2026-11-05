@@ -36,58 +36,11 @@ The whole bot is shown as a single process, together with the external systems i
 
 This diagram shows where the bot runs and what it connects to over the network.
 
-```mermaid
-flowchart LR
-  %% ---------- PEOPLE ----------
-  %% Users never talk to the bot directly; they only use the Discord app.
-  USER["Discord users"]
-
-  %% ---------- WHERE THE BOT RUNS ----------
-  %% Codespaces builds a container (from .devcontainer/) on Microsoft Azure.
-  %% The bot only exists while someone is running it in a Codespace.
-  subgraph GH["GitHub Codespaces (Microsoft Azure)"]
-    subgraph C["Container"]
-      BOT["Bot (Node.js)"]
-    end
-  end
-
-  %% ---------- EXTERNAL SERVICES ----------
-  %% Each subgraph is a separate company's network.
-  subgraph DC["Discord"]
-    GW["Gateway"]
-    API["REST API"]
-    VOICE["Voice server"]
-  end
-
-  subgraph APPLE["Apple"]
-    ITUNES["iTunes Search API"]
-    PREVIEW["Audio previews"]
-  end
-
-  subgraph GOOGLE["Google"]
-    GEMINI["Gemini API"]
-  end
-
-  %% ---------- CONNECTIONS ----------
-  %% Users reach Discord through the Discord app.
-  USER -- "Discord app" --> DC
-
-  %% Discord: one open WebSocket to hear messages, HTTPS to reply, UDP for voice.
-  BOT -- "WebSocket: receives messages" --> GW
-  BOT -- "HTTPS: sends replies" --> API
-  BOT -- "UDP: streams /play audio" --> VOICE
-
-  %% Apple: /song and /play search iTunes; /play also downloads the preview file.
-  BOT -- "HTTPS: song search" --> ITUNES
-  BOT -- "HTTPS: downloads preview" --> PREVIEW
-
-  %% Google: AI commands send the question to Gemini.
-  BOT -- "HTTPS: AI questions" --> GEMINI
-```
+![Network Diagram](docs/images/network-diagram.png)
 
 ### How to read this diagram
 
-- **Boxes** are services. **Outlined areas** are separate networks owned by different companies.
+- **Gray boxes** are services. **Dashed boxes** are separate networks owned by different companies.
 - **Arrows** point from whoever starts the connection. All of the bot's connections start at the bot, so nothing on the internet connects into the Codespace.
 
 ### Connection types
