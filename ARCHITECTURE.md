@@ -35,7 +35,7 @@ The whole bot is shown as a single process, together with the external systems i
 
 This use case diagram depicts all the possible commands a discord user can input. It shows which commands are connected to an external service that returns requested data and which commands are handled entirely within the discord system. 
 
-![Level 2 Use Case Diagram](docs/images/docs/images/Music Bot - Use Case Diagram.jpg)
+![Level 1 Use Case Diagram](docs/images/Music Bot - Use Case Diagram.jpg)
 
 | Color | Meaning |
 | --- | --- |
