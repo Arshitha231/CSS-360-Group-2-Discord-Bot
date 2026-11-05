@@ -41,7 +41,7 @@ This diagram shows where the bot runs and what it connects to over the network.
 ### How to read this diagram
 
 - **Gray boxes** are services. **Dashed boxes** are separate networks owned by different companies.
-- **Arrows** point from whoever starts the connection. All of the bot's connections start at the bot, so nothing on the internet connects into the Codespace.
+- **Arrows** point from whoever starts the connection. All of the bot's connections start at the bot, so nothing on the internet connects into the bot.
 
 ### Connection types
 
