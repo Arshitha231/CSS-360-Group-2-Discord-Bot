@@ -30,3 +30,17 @@ The whole bot is shown as a single process, together with the external systems i
 | 3.0 | Manage Favorites | `/saveFavorite`, `/viewFavorites` | iTunes API, D1 Favorites DB |
 | 4.0 | Song Preview Card | `/song` | iTunes API |
 | 5.0 | Voice Channel Preview | `/play` | iTunes API |
+
+## Use Case Diagram
+
+This use case diagram depicts all the possible commands a discord user can input. It shows which commands are connected to an external service that returns requested data and which commands are handled entirely within the discord system. 
+
+![Level 2 Use Case Diagram](docs/images/docs/images/Music Bot - Use Case Diagram.jpg)
+
+| Color | Meaning |
+| --- | --- |
+| Blue | Internal Command |
+| Yellow | Externally Supported Command |
+| Gray | External Service |
+| Purple | User |
+| Light Yellow | Internal Store | 
