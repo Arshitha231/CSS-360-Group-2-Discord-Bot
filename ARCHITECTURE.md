@@ -31,6 +31,20 @@ The whole bot is shown as a single process, together with the external systems i
 | 4.0 | Song Preview Card | `/song` | iTunes API |
 | 5.0 | Voice Channel Preview | `/play` | iTunes API |
 
+## Use Case Diagram
+
+This use case diagram depicts all the possible commands a discord user can input. It shows which commands are connected to an external service that returns requested data and which commands are handled entirely within the discord system. 
+
+<img width="1495" height="962" alt="Music Bot - Use Case Diagram" src="https://github.com/user-attachments/assets/230027a8-c3a3-4f76-b743-df1fc1c50ccf" />
+
+### Legend
+| Color | Meaning |
+| --- | --- |
+| Blue | Internal Command |
+| Yellow | Externally Supported Command |
+| Gray | External Service |
+| Purple | User |
+| Light Yellow | Internal Store | 
 
 ## Network Diagram
 
