@@ -64,3 +64,17 @@ This diagram shows where the bot runs and what it connects to over the network.
 | WebSocket | Receiving messages from Discord | One connection the bot opens at startup and keeps open, so Discord can push new messages anytime |
 | HTTPS | Replies, song search, audio download, AI | The bot sends a request and waits for one response |
 | UDP | Streaming `/play` audio | A fast live stream that does not wait to confirm every packet arrived |
+
+
+## Control Flow Diagram
+
+This control flow diagram illustrates how the Discord music bot processes incoming messages and executes commands. It shows the sequence of operations, decision branches (if-else and yes-no branches), and interactions between the main message handler (messageCreate.js) and the favorite song feature (favorite-song.js). It also show how commands like /song and /play use the iTunes API to retrieve song information and previews, as well as how the bot connects to a Discord voice channel to play music. Additionally, it illustrates the /ai and /similar commands, which use the Google Gemini AI to prompt and generate responses and song recommendations.
+<img width="1928" height="1166" alt="Music Bot - Control Flow Diagram" src="/workspaces/CSS-360-Group-2-Discord-Bot/docs/images/Control_Flow_Diagram.png" />
+
+### Legend
+| Shape | Meaning |
+| --- | --- |
+| Blue Diamond | If Else Branches |
+| Yellow Rectangle | Internal Commands / Processes |
+| Green Oval | Start / End Points |
+| Arrows | Execution Flow / Connectors |
