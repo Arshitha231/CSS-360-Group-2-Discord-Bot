@@ -64,3 +64,29 @@ This diagram shows where the bot runs and what it connects to over the network.
 | WebSocket | Receiving messages from Discord | One connection the bot opens at startup and keeps open, so Discord can push new messages anytime |
 | HTTPS | Replies, song search, audio download, AI | The bot sends a request and waits for one response |
 | UDP | Streaming `/play` audio | A fast live stream that does not wait to confirm every packet arrived |
+
+
+## Activity Diagram
+
+This activity diagram shows how the Music AI Discord Bot work with different commands, make decisions, and respond to discord users.
+<img width="4113" height="8745" alt="Music Bot" src="https://github.com/user-attachments/assets/f485740d-8da2-4775-95a9-53a74b3cd4e2" />
+
+### How to read this diagram 
+
+-**Black circle:** Start
+
+-**Blue diamonds:** Decisions and merge points
+
+-**Yellow boxes:** Actions and responses
+
+-**Gray boxes:** Internal processing
+
+-**Black circles with X:** End of a flow
+
+
+
+
+
+
+
+
