@@ -93,7 +93,9 @@ This activity diagram shows how the Music AI Discord Bot work with different com
 ## Control Flow Diagram
 
 This control flow diagram illustrates how the Discord music bot processes incoming messages and executes commands. It shows the sequence of operations, decision branches (if-else and yes-no branches), and interactions between the main message handler (messageCreate.js) and the favorite song feature (favorite-song.js). It also show how commands like /song and /play use the iTunes API to retrieve song information and previews, as well as how the bot connects to a Discord voice channel to play music. Additionally, it illustrates the /ai and /similar commands, which use the Google Gemini AI to prompt and generate responses and song recommendations.
-<img width="1928" height="1166" alt="Music Bot - Control Flow Diagram" src="/workspaces/CSS-360-Group-2-Discord-Bot/docs/images/Control_Flow_Diagram.png" />
+
+<img width="1956" height="1150" alt="Control_Flow_Diagram" src="https://github.com/user-attachments/assets/895e315d-5148-4e49-83af-9ce99ebeec83" />
+
 
 ### Legend
 | Shape | Meaning |
