@@ -66,6 +66,30 @@ This diagram shows where the bot runs and what it connects to over the network.
 | UDP | Streaming `/play` audio | A fast live stream that does not wait to confirm every packet arrived |
 
 
+## Activity Diagram
+
+This activity diagram shows how the Music AI Discord Bot work with different commands, make decisions, and respond to discord users.
+<img width="4113" height="8745" alt="Music Bot" src="https://github.com/user-attachments/assets/f485740d-8da2-4775-95a9-53a74b3cd4e2" />
+
+### How to read this diagram 
+
+-**Black circle:** Start
+
+-**Blue diamonds:** Decisions and merge points
+
+-**Yellow boxes:** Actions and responses
+
+-**Gray boxes:** Internal processing
+
+-**Black circles with X:** End of a flow
+
+
+
+
+
+
+
+
 ## Control Flow Diagram
 
 This control flow diagram illustrates how the Discord music bot processes incoming messages and executes commands. It shows the sequence of operations, decision branches (if-else and yes-no branches), and interactions between the main message handler (messageCreate.js) and the favorite song feature (favorite-song.js). It also show how commands like /song and /play use the iTunes API to retrieve song information and previews, as well as how the bot connects to a Discord voice channel to play music. Additionally, it illustrates the /ai and /similar commands, which use the Google Gemini AI to prompt and generate responses and song recommendations.
