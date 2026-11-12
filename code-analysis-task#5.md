@@ -231,3 +231,107 @@ A realistic first goal is 30% line coverage, focused on these three areas. After
 ### Recommendation
 
 Use the existing mocha and chai setup, and add c8 to the `test` script so every run prints a coverage report. Mock `askGemini` and axios so tests never call real APIs. Then add `npm test` to the GitHub Actions workflow so every push is checked, and fail the build if coverage drops below the agreed goal.
+
+
+
+
+
+
+
+## 5. Threat Model (Arshitha Bala Dhayanidhi)
+
+### Introduction
+
+In this part, I built a threat model of our Discord bot to find security and reliability risks. My goal was to find where untrusted data enters or leaves the bot, figure out what could go wrong at each of those points, and decide what we should do about each risk.
+
+### Method
+
+I followed the four threat-modeling questions: *What are we working on? What can go wrong? What are we going to do about it? Did we do a good enough job?*
+
+To answer the first question, I used the Level 1 Data Flow Diagram and the Network Diagram from [ARCHITECTURE.md](ARCHITECTURE.md). The model covers all five features, plus how the bot is hosted and started:
+
+| Feature | Command | External service |
+| --- | --- | --- |
+| AI Song Recommendation by mood | `/ai` | Google Gemini API |
+| Similar Song Recommendation | `/similar` | Google Gemini API |
+| Manage Favorites | `/saveFavorite`, `/viewFavorites` | Favorites storage |
+| Song Preview Card | `/song` | iTunes API |
+| Voice Channel Preview | `/play` | iTunes API, Discord voice channel |
+
+Next, I marked every **trust boundary** in the diagram. A trust boundary is where data crosses between something our team controls (our bot code) and something we don't. Every arrow between our code and an outside entity crosses a boundary, in either direction.
+
+| Data flow (from → to) | Data | Crosses a trust boundary? |
+| --- | --- | --- |
+| Discord User → all five features | commands and text typed by the user | Yes. Any user can type anything. |
+| Bot → Discord User | replies, cards, AI answers | Yes. Anything we send is visible to everyone in the server. |
+| iTunes API → `/song`, `/play` | track metadata, album art, preview URL | Yes. We don't control Apple's servers or their responses. |
+| Gemini API → `/ai`, `/similar` | AI-generated text | Yes. We don't control what the AI writes back. |
+| `/play` → Discord Voice Channel | audio stream | Yes. Everyone in the channel hears it. |
+| Favorites → Favorites storage | saved songs | No. Favorites are kept in the bot's own memory. They would cross a boundary if we move them to an external database like D1. |
+
+At each boundary, I used **STRIDE** to brainstorm threats. STRIDE is a checklist of six threat types:
+
+| Letter | Threat type | Question |
+| --- | --- | --- |
+| S | Spoofing | Can someone pretend to be someone else? |
+| T | Tampering | Can someone change data we rely on? |
+| R | Repudiation | Can someone do something harmful without a trace? |
+| I | Information disclosure | Can private info leak? |
+| D | Denial of service | Can someone or something stop the bot from working? |
+| E | Elevation of privilege | Can a user do something they shouldn't be allowed to? |
+
+I checked each threat against the code on the `main` branch and rated it **High**, **Medium** or **Low** based on how likely it is and how much harm it would do. Our team runs a different branch, `feature/gemini-api`, for demos. That branch starts the bot differently, and I point out where this matters (T11).
+
+### Findings
+
+**Existing protections.** Some risks already handled by the bot:
+
+- The bot token and API keys are meant to live in `.env`, which is listed in `.gitignore`.
+- `/song` has a 10-second timeout on the iTunes request and a `catch` block that shows a friendly error without internal details.
+- `/ai` and `/similar` split long replies into 1,900-character chunks to stay under Discord's 2,000-character limit.
+- `askGemini` has a 30-second timeout and limits Gemini's answer to 400 output tokens.
+- `/saveFavorite` only accepts replies to the bot's own messages, and users can only add to their own list.
+
+**Threats found:** 
+
+| # | Feature | Threat | STRIDE | Risk |
+| --- | --- | --- | --- | --- |
+| T1 | Song Preview Card | The user enters 2,000–4,000 characters for the song name (Nitro users can send up to 4,000). The "No results found" message doesn't come through, because Discord has a 2,000-character limit for bot messages and the message repeats the entered song name. | D | Medium |
+| T2 | Song Preview Card | iTunes is down. | D | Low |
+| T3 | Hosting | The bot runs only in a Codespace, so it goes offline when the Codespace stops. The deploy workflow triggers on a `release` branch that doesn't exist, so it never runs. | D | Medium |
+| T4 | `/ai` and `/similar` | The user's text goes straight into Gemini's prompt. A user could type instructions ("ignore your rules and ...") to make the bot ignore its rules or post inappropriate content. | T | Medium |
+| T5 | `/ai`, `/similar`, `/song` | The bot posts Gemini's reply and repeats user text without restricting mentions. If the bot has permission, a user could make it ping `@everyone` or `@here`, directly or by tricking Gemini into writing it. | E | Medium |
+| T6 | Save favorites | Favorites are stored in a `new Map()` in memory (also noted in Section 1), which means the data will be lost if the bot restarts. The DFD shows a D1 database instead. | D | Medium |
+| T7 | Save favorites | It checks if the message was sent by the bot, but not if the message was an error message or song details. Users can save error messages, or their own text through "No results found for ...", as favorites. Only their own list is affected. | T | Low |
+| T8 | `/viewFavorites` | If the list is too long, it doesn't come through because of Discord's 2,000-character limit, and the user can never view their favorites again. | D | Low |
+| T9 | `/play` | The iTunes request has no timeout, unlike `/song`'s, so the command can hang with no reply if iTunes is slow. | D | Low |
+| T10 | `/play` | It doesn't check whether the user is in a voice channel and always joins one hardcoded channel. Anyone in any text channel can make the bot play audio there, and spamming `/play` starts a new audio player and ffmpeg process each time. | D | Medium |
+| T11 | Startup on `main` | On `main`, `npm start` runs `src/events/index.js`, which calls `client.login("")` instead of reading the token from `.env`. To run `main`, a teammate has to paste the token into the code, where it can easily be committed. Anyone with the token fully controls the bot. (`feature/gemini-api` reads the token from `.env` correctly.) | I | High |
+
+**Other gaps.** These aren't threats by themselves, but they came up while building the model:
+
+1. **The diagram and the code disagree.** The DFD shows a D1 Favorites database, but the code uses an in-memory `Map` (T6).
+2. **Setup docs are incomplete.** `.env-sample` doesn't list `GEMINI_API_KEY`, which `/ai` and `/similar` need.
+3. **Leftover template code.** `build-and-deploy.yml` was copied from the class memebot template and never updated. It still tags the image `memebot:latest` and triggers on a branch that doesn't exist.
+
+### Recommendations
+
+Each threat is marked as **Fix** it where I proposed a fix, **Accept** it (with a reason), or **Already handled** (if the bot protects against it).
+
+| # | Response | Details |
+| --- | --- | --- |
+| T1 | Fix | Use a generic error message like "No results found" or repeat only x characters of the user input |
+| T2 | Already handled | The iTunes request has a 10-second timeout, and the `catch` block shows the user "Sorry, I couldn't reach the music service" while keeping error details in the console. |
+| T3 | Accept | For this class, the bot only needs to be online during testing and demos. One teammate runs it at a time to avoid duplicate replies. Fix or remove the outdated deploy workflow. |
+| T4 | Accept + partial fix | Prompt injection can't be fully prevented with current AI models. Limit input length, keep the 400-token output limit, and restrict mentions (T5). The bot can only post text, which limits the impact. |
+| T5 | Fix | Add `allowedMentions: { parse: [] }` to bot replies, or set it once on the Discord client. |
+| T6 | Fix | Connect favorites to the D1 database as the DFD shows, or update the DFD to match the code. |
+| T7 | Fix | When `/song` finds a track, remember that message's ID with the track name and artist, and have `/saveFavorite` save that track info instead of the message text. |
+| T8 | Fix | Split long `/viewFavorites` replies into 1,900-character chunks, the same way `/ai` does. |
+| T9 | Fix | Add `timeout: 10000` to `/play`'s iTunes request, matching `/song`. |
+| T10 | Fix | Join the user's own voice channel, refuse `/play` if they aren't in one, and ignore new `/play` commands while a song is playing. |
+| T11 | Fix | Make `main` start the bot the same way as `feature/gemini-api`, reading the token from `.env`. Add `GEMINI_API_KEY` to `.env-sample`. If a token was ever committed, reset it in the Discord Developer Portal. |
+
+I recommend fixing T11 first, since it puts the whole bot at risk. After that, T1, T5 and T10 should come next, because any user in the server could trigger them.
+
+To check whether this model is good enough, I tested T1 with a fuzzer (see Section 6). The other threats are good candidates for the unit tests and smoke test that Section 4 recommends.
