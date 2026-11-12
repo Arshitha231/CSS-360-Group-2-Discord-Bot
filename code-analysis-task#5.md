@@ -75,7 +75,7 @@ The execute() function has a complexity of 12, which is slightly above my thresh
 ### 3. guildMemberAdd.js — Low Complexity
 
 <img width="2221" height="492" alt="guildMemberAdd" src="https://github.com/user-attachments/assets/1d29d126-ff62-40b6-bd8b-e0e2d5136663" />
-ESLint reported four functions with complexity scores of 2, 3, 1, and 1. All four functions are beloved the threshold of 10, which suggests that their control flow is relatively simple.
+ESLint reported four functions with complexity scores of 2, 3, 1, and 1. All four functions are below the threshold of 10, which suggests that their control flow is relatively simple.
 
 ### 4. ready.js — Low Complexity
 
