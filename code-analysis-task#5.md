@@ -335,3 +335,58 @@ Each threat is marked as **Fix** it where I proposed a fix, **Accept** it (with 
 I recommend fixing T11 first, since it puts the whole bot at risk. After that, T1, T5 and T10 should come next, because any user in the server could trigger them.
 
 To check whether this model is good enough, I tested T1 with a fuzzer (see Section 6). The other threats are good candidates for the unit tests and smoke test that Section 4 recommends.
+
+
+## 6. Fuzzer (Arshitha Bala Dhayanidhi)
+
+### Introduction
+
+In this part, I wrote a fuzzer to try to break our bot with random input. A fuzzer automatically generates hundreds of random inputs and checks that the bot follows certain rules for every one of them. My goal was to test the whole bot and to check whether the threats I found in my threat model (Section 5) actually happen.
+
+### Method
+
+I used [fast-check](https://wiki.communitydata.science/Fast-check), a property-based testing library for JavaScript. I installed it with `npm install --save-dev fast-check` and wrote the fuzzer in `src/fuzz/fuzz-bot.js`. It runs from the repo root with `node src/fuzz/fuzz-bot.js`
+
+The fuzzer calls the real `execute()` functions in `messageCreate.js` and `favorite-song.js`. To run without a bot token or internet access, it replaces every outside service with a fake version:
+
+| Service | Fake version |
+| --- | --- |
+| iTunes API (`/song`, `/play`) | Randomly returns either no results or a track with random details |
+| Gemini API (`/ai`, `/similar`) | Returns random text up to 3,000 characters |
+| Discord message | Records everything the bot sends and, like real Discord, rejects any message over 2,000 characters |
+| Voice channel (`/play`) | Not available, so `/play` stops before playing audio |
+
+For each test, fast-check builds a random message from one of our 9 commands (`/song`, `/play`, `/similar`, `/ai`, `/viewFavorites`, `/saveFavorite`, `hello`, `ping`, `help`) followed by random text. Half of the random texts are short (up to 100 characters), and half are long (1,990 to 4,000 characters), since Discord Nitro users can send up to 4,000 characters.
+
+The fuzzer checks two rules for every message:
+
+1. The bot never crashes.
+2. The bot never tries to send a message longer than Discord's 2,000-character limit.
+
+I ran 500 random messages per run on the `main` branch.
+
+### Findings
+
+<img width="1135" height="116" alt="Fuzzer output: FAIL on /song" src="https://github.com/user-attachments/assets/ff6da61d-6003-4d9d-bb74-6b2e7f32caa8" />
+
+**1. `/song` breaks with long song names.** The fuzzer failed after 25 tests. fast-check shrank the failing input to `/song` followed by a 1,990-character song name. When iTunes finds no results, the bot replies `No results found for "<song name>".`, which repeats the whole song name. With a long name, this reply goes over 2,000 characters, Discord rejects it, and the `catch` block shows the user the wrong error: "Sorry, I couldn't reach the music service." This confirms threat **T1** from Section 5. The reply adds 24 characters around the song name, so any song name longer than 1,976 characters triggers the bug.
+
+**2. The other commands passed.** When I ran the fuzzer again without `/song`, all 500 random messages passed.
+
+
+<img width="1340" height="67" alt="Fuzzer output: PASS without including /song" src="https://github.com/user-attachments/assets/8aa01801-80f9-4866-9167-d3d4a42e816a" />
+
+
+`/ai` and `/similar` handled long Gemini replies because they already split replies into 1,900-character chunks. `/play`, `/viewFavorites`, `/saveFavorite`, `hello`, `ping`, and `help` did not crash or send oversized messages.
+
+**3. What the fuzzer could not test.** Some threats from Section 5 need more than random text to trigger:
+
+- **T8** (long `/viewFavorites` list) needs many saved songs first, but each fuzz test starts with an empty list.
+- **T9** and **T10** (`/play` timeout and voice channel checks) need a real voice channel and a slow iTunes response.
+- **T4** and **T5** (prompt injection and `@everyone` pings) depend on what the real Gemini model writes, which a fake can't reproduce.
+
+### Recommendations
+
+I recommend fixing T1 by rejecting song names longer than 200 characters right after the empty-name check in `/song`, as proposed in Section 5. After the fix, the fuzzer should pass, and we can keep it as a regression test to make sure the bug doesn't come back.
+
+I also recommend extending the fuzzer to cover the threats it could not reach. For example, it could save many favorites before calling `/viewFavorites` (T8), or simulate a slow iTunes response for `/play` (T9). Finally, adding the fuzzer to `npm test` would let it run automatically along with the unit tests that Section 4 recommends.
