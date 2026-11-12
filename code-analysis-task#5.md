@@ -75,7 +75,7 @@ The execute() function has a complexity of 12, which is slightly above my thresh
 ### 3. guildMemberAdd.js — Low Complexity
 
 <img width="2221" height="492" alt="guildMemberAdd" src="https://github.com/user-attachments/assets/1d29d126-ff62-40b6-bd8b-e0e2d5136663" />
-ESLint reported four functions with complexity scores of 2, 3, 1, and 1. All four functions are above the threshold of 10, which suggests that their control flow is relatively simple.
+ESLint reported four functions with complexity scores of 2, 3, 1, and 1. All four functions are beloved the threshold of 10, which suggests that their control flow is relatively simple.
 
 ### 4. ready.js — Low Complexity
 
@@ -85,7 +85,7 @@ ESLint reported two functions, both with a complexity of 1. This is the lowest p
 ### 5. loadEvents.js — Low Complexity
 
 <img width="2327" height="544" alt="loadEvents" src="https://github.com/user-attachments/assets/6a276741-92eb-47f7-b577-c6e0f2dfa11d" />
-The loadEvents() function has a complexity of 5, while its arrow function has a complexity of 1. Both scores are above the threshold of 10, suggesting that these functions have relatively simple control flow.
+The loadEvents() function has a complexity of 5, while its arrow function has a complexity of 1. Both scores are below the threshold of 10, suggesting that these functions have relatively simple control flow.
 
 ### 6. loadFiles.js — Low Complexity
 
