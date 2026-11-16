@@ -113,22 +113,6 @@ For `favorite-song.js`, I recommend separating the saving and viewing features i
 The other files have low complexity scores, so I don't think they need changes based on cyclomatic complexity alone.
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## 3. Cohesion and Coupling (Jack Jiang)
 
 ### Method
@@ -511,7 +495,7 @@ This test challenges `src/events/messageCreate.js` across all of its commands an
 
 ### Function
 
-The test mocks all external dependencies (Gemini AI, axios/iTunes API, @discordjs/voice, child_process, ffmpeg-static) so nothing joins a real voice channel, touches the network, or launches an audio process. The `makeMessage()` helper builds a mock message object with the properties the file uses (content, author.bot, reply, channel.send, guild.channels.cache.get), and the fakeTrack object is sent to iTunesAPI for an iTunes result. Each test mock's behavior then determines what the file did: what replies were sent, which functions were called, and which were not called. 
+Command `npm run smokeTest` runs the test in the terminal. This test mocks all external dependencies (Gemini AI, axios/iTunes API, @discordjs/voice, child_process, ffmpeg-static) so nothing joins a real voice channel, touches the network, or launches an audio process. The `makeMessage()` helper builds a mock message object with the properties the file uses (content, author.bot, reply, channel.send, guild.channels.cache.get), and the fakeTrack object is sent to iTunesAPI for an iTunes result. Each test mock's behavior then determines what the file did: what replies were sent, which functions were called, and which were not called. 
 
 ### Tests 
 
@@ -527,7 +511,7 @@ The test mocks all external dependencies (Gemini AI, axios/iTunes API, @discordj
 
 ### Results
 
-The test ran 18 tests in 18ms with most time spent importing (85%) rather than running tests (8%). Every command path in messageCreate.js, including the error paths, behaves as intended. 
+The test ran 18 tests with most time spent importing (85%) rather than running tests (2%). Every command path in messageCreate.js, including the error paths, behaves as intended. 
 
 ![c8 coverage output](docs/images/smoke-test-results.png)
 
@@ -544,6 +528,7 @@ The test ran 18 tests in 18ms with most time spent importing (85%) rather than r
 This test checks that the favorites feature is correct in isolation. `viewFavorites` and `saveFavorite` store and display the correct requested songs, ignores bot messages, ignores the wrong arguments, and keeps each user's list separate. 
 
 ### Function
+- Command `npm run tylerTest` runs the test in the terminal
 - `makeMessage()` builds a fake Discord message, a `reply` function, `client.user.id` (the bot's ID), and `channel.message.fetch` returning an original message.
 - `botSong()` builds the bot's original message, optionally from a different bot ID.
 - `beforeEach` calls `faovrites.clear()`, so state refreshes between tests.
@@ -562,9 +547,9 @@ This test checks that the favorites feature is correct in isolation. `viewFavori
 
 ### Results
 
-The test ran 17 tests in 14ms with most time spent importing (86%) rather than tests (4%). Every command, including error paths, behave as intended. However the source code shows some problems the tests don't catch, and a couple of passing tests are hiding them. 
+The test ran 17 tests with most time spent importing (51%) rather than running tests (18%). Every command, including error paths, behave as intended. However the source code shows some problems the tests don't catch, and a couple of passing tests are hiding them. 
 
-![c8 coverage output](docs/images/smoke-test-results.png)
+![c8 coverage output](docs/images/favorite-song-test-results.png)
 
 ### Recommendation
 
