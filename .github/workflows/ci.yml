@@ -27,5 +27,12 @@ jobs:
       - name: Run ESLint
         run: npm run lint
 
-      - name: Run unit tests
-        run: npm test
+      - name: Run Michael's unit tests
+        run: npm run testMike
+
+      - name: Run Michael's unit tests
+        run: npm run testTyler
+        
+      - name: Run Tyler's tests
+        run: npm run smokeTest
+

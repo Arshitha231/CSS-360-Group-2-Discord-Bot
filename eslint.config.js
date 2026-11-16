@@ -1,17 +1,15 @@
 import js from "@eslint/js";
+import globals from "globals";
 
 export default [
     {
-        files: ["**/*.js"],
+        files: ["**/*.{js,mjs,cjs}"],
         ...js.configs.recommended,
         languageOptions: {
             ecmaVersion: "latest",
             sourceType: "module",
             globals: {
-                console: "readonly",
-                process: "readonly",
-                __dirname: "readonly",
-                __filename: "readonly",
+                ...globals.node,
                 fetch: "readonly",
                 AbortSignal: "readonly"
             },
