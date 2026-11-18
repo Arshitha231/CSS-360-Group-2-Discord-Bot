@@ -106,7 +106,7 @@ const event = {
 
         if (!track) {
           await message.reply(
-            `No results found for "${song}".`
+            `No results found".`
           );
           return;
         }
